@@ -1,15 +1,8 @@
-const fs = require('fs');
-const path = require("path");
 const Fastify = require('fastify');
-const cerpen = require('./api/timeApi.js'); // Impor fungsi cerpen dari timeApi.js
+const cerpen = require('./timeApi.js'); // Impor fungsi cerpen dari timeApi.js
 
 const app = Fastify({
   logger: true
-});
-
-// Konfigurasi untuk file statis
-app.register(require('@fastify/static'), {
-  root: path.join(__dirname, 'api'),
 });
 
 // Endpoint utama
@@ -37,7 +30,4 @@ app.get('/cerpen/:category', async (req, res) => {
 });
 
 // Menentukan port server
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`Server running on port : ${port}`);
-});
+module.exports = app;
