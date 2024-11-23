@@ -14,7 +14,7 @@ app.register(require('@fastify/static'), {
 
 // Endpoint utama
 app.get('/', async (req, res) => {
-  res.send({ message: 'Selamat datang di API Cerpen By Basuki!, example: bs-cerpen-api.vercel.app/cerpen/sedih' });
+  res.send({ message: 'Selamat datang di API Cerpen By Basuki!, "example:" bs-cerpen-api.vercel.app/cerpen/sedih' });
 });
 
 // Endpoint untuk mendapatkan cerpen berdasarkan kategori
