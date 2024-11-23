@@ -7,6 +7,9 @@ async function cerpen(category) {
         let title = category.toLowerCase().replace(/[()*]/g, "");
         let judul = title.replace(/\s/g, "-");
         let page = Math.floor(Math.random() * 5);
+
+        console.log(`Fetching category: ${judul}, page: ${page}`); // Debug log
+
         axios.get('http://cerpenmu.com/category/cerpen-' + judul + '/page/' + page)
             .then((get) => {
                 let $ = cheerio.load(get.data);
@@ -14,6 +17,9 @@ async function cerpen(category) {
                 $('article.post').each(function (a, b) {
                     link.push($(b).find('a').attr('href'));
                 });
+
+                console.log(`Found links: ${link.length}`); // Debug log
+
                 let random = link[Math.floor(Math.random() * link.length)];
                 axios.get(random)
                     .then((res) => {
@@ -25,6 +31,9 @@ async function cerpen(category) {
                             lolos: $$('#content > article').text().split('Lolos moderasi pada: ')[1].split('\n')[0],
                             cerita: $$('#content > article > p').text()
                         };
+
+                        console.log(`Fetched story: ${hasil.title}`); // Debug log
+
                         resolve(hasil);
                     })
                     .catch(reject);
@@ -32,5 +41,6 @@ async function cerpen(category) {
             .catch(reject);
     });
 }
+
 
 module.exports = cerpen;
