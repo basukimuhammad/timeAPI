@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "@fastify/static": "^7.0.4",
     "axios": "^1.7.2",
     "fastify": "^4.27.0",
