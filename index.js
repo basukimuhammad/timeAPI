@@ -1,5 +1,5 @@
 const Fastify = require('fastify');
-const cerpen = require('./timeApi.js'); // Impor fungsi cerpen dari timeApi.js
+const cerpen = require('./api/timeApi.js'); // Impor fungsi cerpen dari timeApi.js
 
 const app = Fastify({
   logger: true
