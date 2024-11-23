@@ -1,51 +1,36 @@
-const moment = require("moment");
-const axios = require("axios");
+const fs = require('fs');
+const cheerio = require('cheerio');
+const axios = require('axios');
 
-module.exports = function(req) {
-  return new Promise((resolve, reject) => {
-    axios.get("https://time.akamai.com/") 
-      .then(res => {
-        const time = moment(res.data);
-        const gmtOffset = req.query.gmt;
-        const unix = (res.data + (3600 * gmtOffset));
-        if (!gmtOffset) {
-          resolve({
-            "info": "query required",
-            "example": "timeapi.mininxd.my.id?gmt=7"
-          });
-          return;
-        }
-
-        if (gmtOffset >= 13 || gmtOffset <= -13) {
-          resolve({
-            "info": "GMT is exceeded"
-          });
-          return;
-        }
-
-        const newTime = moment.unix(time + (req.query.gmt * 3600));
-        resolve({
-          "gmt": gmtOffset,
-          "unix": unix,
-          "hour": newTime.format("HH"),
-          "minute": newTime.format("mm"),
-          "second": newTime.format("ss"),
-          "hour12": newTime.format("hh"),
-          "ampm": newTime.format("A"),
-          "time": newTime.format("HH:mm"),
-          "times": newTime.format("HH:mm:ss"),
-          "time12": newTime.format("hh:mm"),
-          "times12": newTime.format("h:mm:ss"),
-          "day": newTime.format("DD"),
-          "days": newTime.format("dddd"),
-          "month": newTime.format("MM"),
-          "months": newTime.format("MMMM"),
-          "year": newTime.format("YYYY"),
-          "date": newTime.format("L"),
-        });
-      })
-      .catch(err => {
-        reject({ "info": err });
-      });
-  });
+async function cerpen(category) {
+    return new Promise((resolve, reject) => {
+        let title = category.toLowerCase().replace(/[()*]/g, "");
+        let judul = title.replace(/\s/g, "-");
+        let page = Math.floor(Math.random() * 5);
+        axios.get('http://cerpenmu.com/category/cerpen-' + judul + '/page/' + page)
+            .then((get) => {
+                let $ = cheerio.load(get.data);
+                let link = [];
+                $('article.post').each(function (a, b) {
+                    link.push($(b).find('a').attr('href'));
+                });
+                let random = link[Math.floor(Math.random() * link.length)];
+                axios.get(random)
+                    .then((res) => {
+                        let $$ = cheerio.load(res.data);
+                        let hasil = {
+                            title: $$('#content > article > h1').text(),
+                            author: $$('#content > article').text().split('Cerpen Karangan: ')[1].split('Kategori: ')[0],
+                            kategori: $$('#content > article').text().split('Kategori: ')[1].split('\n')[0],
+                            lolos: $$('#content > article').text().split('Lolos moderasi pada: ')[1].split('\n')[0],
+                            cerita: $$('#content > article > p').text()
+                        };
+                        resolve(hasil);
+                    })
+                    .catch(reject);
+            })
+            .catch(reject);
+    });
 }
+
+module.exports = cerpen;
