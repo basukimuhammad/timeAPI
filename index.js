@@ -19,16 +19,7 @@ app.register(require("@fastify/swagger"), {
     consumes: ["application/json"],
     produces: ["application/json"],
   },
-});
-
-app.register(require("@fastify/swagger-ui"), {
-  routePrefix: "/docs", // Akses Swagger UI di http://localhost:3000/docs
-  staticCSP: true,
-  transformStaticCSP: (header) => header,
-  transformSpecification: (swaggerObject, req, reply) => {
-    return swaggerObject;
-  },
-  transformSpecificationClone: true,
+  exposeRoute: true, // Untuk memastikan /docs bisa diakses
 });
 
 // ** Konfigurasi File Statis **
@@ -46,8 +37,7 @@ app.get(
   "/cerpen/:category",
   {
     schema: {
-      description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"],
+      description: "Mendapatkan cerpen dari kategori tertentu",
       params: {
         type: "object",
         properties: {
@@ -57,7 +47,6 @@ app.get(
       },
       response: {
         200: {
-          description: "Cerpen berhasil diambil",
           type: "object",
           properties: {
             status: { type: "string" },
@@ -74,7 +63,6 @@ app.get(
           },
         },
         500: {
-          description: "Gagal mengambil cerpen",
           type: "object",
           properties: {
             status: { type: "string" },
@@ -86,7 +74,7 @@ app.get(
     },
   },
   async (req, res) => {
-    const category = req.params.category;
+    const { category } = req.params;
 
     try {
       const hasilCerpen = await cerpen(category); // Panggil fungsi cerpen
