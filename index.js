@@ -87,7 +87,7 @@ app.get(
       },
     },
   },
-}}
+}
   async (req, res) => {
     try {
       const category = req.params.category;
