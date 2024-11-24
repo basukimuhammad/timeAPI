@@ -1,6 +1,6 @@
 const path = require("path");
 const Fastify = require("fastify");
-const cerpen = require("./timeApi.js"); // Import fungsi cerpen
+const cerpen = require("./api/timeApi.js"); // Import fungsi cerpen
 
 const app = Fastify({
   logger: true,
