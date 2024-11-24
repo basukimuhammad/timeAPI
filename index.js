@@ -45,44 +45,64 @@ app.get(
   {
     schema: {
       description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"],
+      tags: ["Cerpen"], // Ini harus sesuai dengan nama tag di konfigurasi Swagger
       params: {
         type: "object",
         properties: {
-          category: { type: "string", description: "Kategori cerpen", example: "cinta" }
+          category: {
+            type: "string",
+            description: "Kategori cerpen yang ingin diambil",
+            example: "cinta", // Contoh nilai
+          },
         },
-        required: ["category"],
+        required: ["category"], // Pastikan parameter ini wajib
       },
       response: {
         200: {
           description: "Cerpen berhasil diambil",
           type: "object",
           properties: {
-            status: { type: "string" },
+            status: { type: "string", example: "success" },
             data: {
               type: "object",
               properties: {
-                title: { type: "string" },
-                author: { type: "string" },
-                kategori: { type: "string" },
-                lolos: { type: "string" },
-                cerita: { type: "string" },
+                title: { type: "string", example: "Judul Cerpen" },
+                author: { type: "string", example: "Nama Penulis" },
+                kategori: { type: "string", example: "Cinta" },
+                lolos: { type: "string", example: "2024-01-01" },
+                cerita: { type: "string", example: "Isi cerpen ..." },
               },
             },
+          },
+        },
+        400: {
+          description: "Parameter tidak valid",
+          type: "object",
+          properties: {
+            status: { type: "string", example: "error" },
+            message: { type: "string", example: "Kategori tidak ditemukan" },
           },
         },
       },
     },
   },
   async (req, res) => {
-    const category = req.params.category;
-    const hasilCerpen = await cerpen(category);
-    res.send({
-      status: "success",
-      data: hasilCerpen,
-    });
+    try {
+      const category = req.params.category;
+      const hasilCerpen = await cerpen(category);
+      res.send({
+        status: "success",
+        data: hasilCerpen,
+      });
+    } catch (err) {
+      res.status(400).send({
+        status: "error",
+        message: err.message,
+      });
+    }
   }
 );
+
 
 // Generate Swagger spec
 app.ready((err) => {
