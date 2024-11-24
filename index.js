@@ -27,23 +27,19 @@ app.register(require("@fastify/swagger"), {
   },
 });
 
-
 app.register(require("@fastify/swagger-ui"), {
   routePrefix: "/docs",
   staticCSP: true,
   transformStaticCSP: (header) => header,
   uiConfig: {
-    docExpansion: "full",
+    docExpansion: "full", // Menampilkan seluruh dokumentasi
     deepLinking: true,
-    showExtensions: true, // Menampilkan ekstensi Swagger
-    showCommonExtensions: true, // Menampilkan ekstensi umum
   },
 });
 
-
 // Main endpoint
 app.get("/", async (req, res) => {
-  res.send("Selamat datang di API Cerpen Fax! Buka dokumentasi di /docs.");
+  res.send("Selamat datang di API Cerpen! Buka dokumentasi di /docs.");
 });
 
 // Endpoint untuk mendapatkan cerpen berdasarkan kategori
@@ -51,47 +47,52 @@ app.get(
   "/cerpen/:category",
   {
     schema: {
-  description: "Dapatkan cerpen berdasarkan kategori",
-  tags: ["Cerpen"], // Pastikan ini sesuai dengan tags di Swagger config
-  params: {
-    type: "object",
-    properties: {
-      category: { type: "string", description: "Nama kategori", example: "cinta" },
-    },
-    required: ["category"],
-  },
-  response: {
-    200: {
-      description: "Cerpen berhasil diambil",
-      type: "object",
-      properties: {
-        status: { type: "string", example: "success" },
-        data: {
+      description: "Dapatkan cerpen berdasarkan kategori",
+      tags: ["Cerpen"], // Harus sesuai dengan tag di Swagger config
+      params: {
+        type: "object",
+        properties: {
+          category: {
+            type: "string",
+            description: "Kategori cerpen yang ingin diambil",
+            example: "cinta",
+          },
+        },
+        required: ["category"],
+      },
+      response: {
+        200: {
+          description: "Cerpen berhasil diambil",
           type: "object",
           properties: {
-            title: { type: "string", example: "Judul Cerpen" },
-            author: { type: "string", example: "Nama Penulis" },
-            kategori: { type: "string", example: "Cinta" },
-            lolos: { type: "string", example: "2024-01-01" },
-            cerita: { type: "string", example: "Isi cerpen ..." },
+            status: { type: "string", example: "success" },
+            data: {
+              type: "object",
+              properties: {
+                title: { type: "string", example: "Judul Cerpen" },
+                author: { type: "string", example: "Nama Penulis" },
+                kategori: { type: "string", example: "Cinta" },
+                lolos: { type: "string", example: "2024-01-01" },
+                cerita: { type: "string", example: "Isi cerpen ..." },
+              },
+            },
+          },
+        },
+        400: {
+          description: "Kesalahan input",
+          type: "object",
+          properties: {
+            status: { type: "string", example: "error" },
+            message: { type: "string", example: "Kategori tidak ditemukan" },
           },
         },
       },
     },
-    400: {
-      description: "Kesalahan input",
-      type: "object",
-      properties: {
-        status: { type: "string", example: "error" },
-        message: { type: "string", example: "Kategori tidak ditemukan" },
-      },
-    },
   },
-}
   async (req, res) => {
     try {
       const category = req.params.category;
-      const hasilCerpen = await cerpen(category);
+      const hasilCerpen = await cerpen(category); // Memanggil fungsi cerpen
       res.send({
         status: "success",
         data: hasilCerpen,
@@ -102,9 +103,8 @@ app.get(
         message: err.message,
       });
     }
-  };
-
-
+  }
+);
 
 // Generate Swagger spec
 app.ready((err) => {
@@ -112,7 +112,6 @@ app.ready((err) => {
   console.log(app.printRoutes());
   app.swagger();
 });
-
 
 // Start the server
 const port = process.env.PORT || 3000;
