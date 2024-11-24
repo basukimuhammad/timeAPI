@@ -1,43 +1,36 @@
-const fs = require('fs');
 const path = require("path");
-const Fastify = require('fastify');
-const cerpen = require('./api/timeApi.js'); // Impor fungsi cerpen dari timeApi.js
+const Fastify = require("fastify");
+const cerpen = require("./timeApi.js"); // Import fungsi cerpen
 
 const app = Fastify({
-  logger: true
+  logger: true,
 });
 
-// Konfigurasi untuk file statis
-app.register(require('@fastify/static'), {
-  root: path.join(__dirname, 'api'),
+// Konfigurasi file statis
+app.register(require("@fastify/static"), {
+  root: path.join(__dirname, "api"),
 });
 
 // Endpoint utama
-app.get('/', async (req, res) => {
-  res.send({ message: 'Selamat datang di API Cerpen By Basuki!,"example":"bs-cerpen-api.vercel.app/cerpen/sedih' });
+app.get("/", async (req, res) => {
+  res.send("Selamat datang di API Cerpen By Basuki! Gunakan endpoint /cerpen/:category untuk mendapatkan cerpen.");
 });
 
-// Endpoint untuk mendapatkan cerpen berdasarkan kategori
-app.get('/cerpen/:category', async (req, res) => {
+// Endpoint untuk mendapatkan cerpen
+app.get("/cerpen/:category", async (req, res) => {
   const category = req.params.category;
 
   try {
     const hasilCerpen = await cerpen(category); // Panggil fungsi cerpen
-    res.send({
-      status: 'success',
-      data: hasilCerpen
-    });
+    res.type("text/plain").send(hasilCerpen); // Kirim hasil dalam format teks biasa
   } catch (error) {
-    res.status(500).send({
-      status: 'error',
-      message: 'Gagal mengambil cerpen. Pastikan kategori benar atau coba lagi nanti.',
-      error: error.message
-    });
+    console.error(`Error in API /cerpen/: ${error.message}`); // Log error API
+    res.status(500).type("text/plain").send("Gagal mengambil cerpen. Pastikan kategori benar atau coba lagi nanti.");
   }
 });
 
 // Menentukan port server
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log(`Server running on port : ${port}`);
+  console.log(`Server running on port: ${port}`);
 });
