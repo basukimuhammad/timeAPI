@@ -28,60 +28,54 @@ app.register(require("@fastify/swagger-ui"), {
   transformStaticCSP: (header) => header,
 });
 
-// ** Konfigurasi File Statis **
-app.register(require("@fastify/static"), {
-  root: path.join(__dirname, "api"),
-});
-
-// ** Menambahkan Skema Global **
-app.addSchema({
-  $id: "responseSchema",
-  type: "object",
-  properties: {
-    status: { type: "string" },
-    data: {
-      type: "object",
-      properties: {
-        title: { type: "string" },
-        author: { type: "string" },
-        kategori: { type: "string" },
-        lolos: { type: "string" },
-        cerita: { type: "string" },
-      },
-    },
-  },
-});
-
 // ** Endpoint Utama **
 app.get("/", async (req, res) => {
   res.send("Selamat datang di API Cerpen Fax! Buka dokumentasi di /docs.");
 });
 
-// ** Endpoint untuk Mendapatkan Cerpen **
+// ** Endpoint untuk Mendapatkan Cerpen dengan Parameter Input**
 app.get(
   "/cerpen/:category",
   {
     schema: {
-      description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"], // Ini akan muncul di dokumentasi Swagger
+      description: "Dapatkan cerpen berdasarkan kategori tertentu.",
+      tags: ["Cerpen"], // Ini akan muncul di Swagger UI
       params: {
         type: "object",
         properties: {
-          category: { type: "string", description: "Kategori cerpen" },
+          category: {
+            type: "string",
+            description: "Kategori cerpen yang ingin Anda ambil.",
+            example: "fantasi", // Contoh nilai input
+          },
         },
-        required: ["category"],
+        required: ["category"], // Wajib diisi
       },
       response: {
         200: {
-          $ref: "responseSchema#", // Referensi skema global
-        },
-        500: {
-          description: "Gagal mengambil cerpen",
+          description: "Cerpen berhasil diambil",
           type: "object",
           properties: {
-            status: { type: "string" },
-            message: { type: "string" },
-            error: { type: "string" },
+            status: { type: "string", example: "success" },
+            data: {
+              type: "object",
+              properties: {
+                title: { type: "string", example: "Cerpen Fantasi" },
+                author: { type: "string", example: "John Doe" },
+                kategori: { type: "string", example: "Fantasi" },
+                lolos: { type: "string", example: "Ya" },
+                cerita: { type: "string", example: "Ini adalah cerita fantastis..." },
+              },
+            },
+          },
+        },
+        500: {
+          description: "Terjadi kesalahan pada server",
+          type: "object",
+          properties: {
+            status: { type: "string", example: "error" },
+            message: { type: "string", example: "Gagal mengambil cerpen." },
+            error: { type: "string", example: "Internal Server Error" },
           },
         },
       },
