@@ -12,8 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@fastify/swagger": "^9.0.0",
-    "@fastify/swagger-ui": "^1.7.0",
+    "@fastify/swagger": "^8.4.0",
+    "@fastify/swagger-ui": "^9.0.2",
     "cheerio": "^1.0.0-rc.12",
     "@fastify/static": "^7.0.4",
     "axios": "^1.7.2",
