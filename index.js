@@ -5,6 +5,9 @@ const cerpen = require("./api/timeApi.js"); // Import fungsi cerpen
 // ** Inisialisasi Fastify **
 const app = Fastify({
   logger: true,
+  ajv: {
+    customOptions: { strict: false }, // Nonaktifkan mode strict untuk support 'example'
+  },
 });
 
 // ** Swagger Plugin **
@@ -114,7 +117,7 @@ app.ready((err) => {
 
 // ** Menentukan Port Server **
 const port = process.env.PORT || 3000;
-app.listen(port, () => {
+app.listen({ port }, () => {
   console.log(`Server running on port: ${port}`);
   console.log(`Swagger docs available at: http://localhost:${port}/docs`);
 });
