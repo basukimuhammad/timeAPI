@@ -19,10 +19,14 @@ app.register(require("@fastify/swagger"), {
     consumes: ["application/json"],
     produces: ["application/json"],
     tags: [
-      { name: "Cerpen", description: "Operasi terkait cerpen" },
+      {
+        name: "Cerpen",
+        description: "Operasi terkait cerpen",
+      },
     ],
   },
 });
+
 
 app.register(require("@fastify/swagger-ui"), {
   routePrefix: "/docs",
@@ -45,17 +49,17 @@ app.get(
   {
     schema: {
       description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"], // Ini harus sesuai dengan nama tag di konfigurasi Swagger
+      tags: ["Cerpen"], // Pastikan ini sama dengan tag di konfigurasi Swagger
       params: {
         type: "object",
         properties: {
           category: {
             type: "string",
             description: "Kategori cerpen yang ingin diambil",
-            example: "cinta", // Contoh nilai
+            example: "cinta",
           },
         },
-        required: ["category"], // Pastikan parameter ini wajib
+        required: ["category"],
       },
       response: {
         200: {
@@ -76,7 +80,7 @@ app.get(
           },
         },
         400: {
-          description: "Parameter tidak valid",
+          description: "Kesalahan pada parameter",
           type: "object",
           properties: {
             status: { type: "string", example: "error" },
@@ -104,11 +108,14 @@ app.get(
 );
 
 
+
 // Generate Swagger spec
 app.ready((err) => {
   if (err) throw err;
-  app.swagger(); // Generate Swagger spec for routes
+  console.log(app.printRoutes());
+  app.swagger();
 });
+
 
 // Start the server
 const port = process.env.PORT || 3000;
