@@ -13,7 +13,7 @@ app.register(require("@fastify/static"), {
 
 // Endpoint utama
 app.get("/", async (req, res) => {
-  res.send("Selamat datang di API Cerpen By Basuki! Gunakan endpoint /cerpen/:category untuk mendapatkan cerpen.");
+  res.send("Selamat datang di API Cerpen By Basuki! Gunakan endpoint /cerpen/category untuk mendapatkan cerpen.");
 });
 
 // Endpoint untuk mendapatkan cerpen
@@ -22,10 +22,17 @@ app.get("/cerpen/:category", async (req, res) => {
 
   try {
     const hasilCerpen = await cerpen(category); // Panggil fungsi cerpen
-    res.type("text/plain").send(hasilCerpen); // Kirim hasil dalam format teks biasa
+    res.send({
+      status: "success",
+      data: hasilCerpen,
+    }); // Kirim hasil dalam format JSON
   } catch (error) {
     console.error(`Error in API /cerpen/: ${error.message}`); // Log error API
-    res.status(500).type("text/plain").send("Gagal mengambil cerpen. Pastikan kategori benar atau coba lagi nanti.");
+    res.status(500).send({
+      status: "error",
+      message: "Gagal mengambil cerpen. Pastikan kategori benar atau coba lagi nanti.",
+      error: error.message,
+    });
   }
 });
 
