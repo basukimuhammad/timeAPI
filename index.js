@@ -2,6 +2,7 @@ const path = require("path");
 const Fastify = require("fastify");
 const cerpen = require("./api/timeApi.js"); // Import fungsi cerpen
 
+// ** Inisialisasi Fastify **
 const app = Fastify({
   logger: true,
 });
@@ -21,25 +22,34 @@ app.register(require("@fastify/swagger"), {
   },
 });
 
-fastify.register(require('@fastify/swagger'), {
-  routePrefix: '/docs',
-  swagger: {
-    info: {
-      title: 'API Cerpen Fax',
-      description: 'API untuk mendapatkan cerpen dari kategori tertentu',
-      version: '1.0.0'
-    },
-    host: 'cerpen-api.vercel.app',
-    schemes: ['https'],
-    consumes: ['application/json'],
-    produces: ['application/json']
-  },
-  exposeRoute: true
+app.register(require("@fastify/swagger-ui"), {
+  routePrefix: "/docs", // Akses Swagger UI di http://localhost:3000/docs
+  staticCSP: true,
+  transformStaticCSP: (header) => header,
 });
 
 // ** Konfigurasi File Statis **
 app.register(require("@fastify/static"), {
   root: path.join(__dirname, "api"),
+});
+
+// ** Menambahkan Skema Global **
+app.addSchema({
+  $id: "responseSchema",
+  type: "object",
+  properties: {
+    status: { type: "string" },
+    data: {
+      type: "object",
+      properties: {
+        title: { type: "string" },
+        author: { type: "string" },
+        kategori: { type: "string" },
+        lolos: { type: "string" },
+        cerita: { type: "string" },
+      },
+    },
+  },
 });
 
 // ** Endpoint Utama **
@@ -53,7 +63,7 @@ app.get(
   {
     schema: {
       description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"],
+      tags: ["Cerpen"], // Ini akan muncul di dokumentasi Swagger
       params: {
         type: "object",
         properties: {
@@ -63,21 +73,7 @@ app.get(
       },
       response: {
         200: {
-          description: "Cerpen berhasil diambil",
-          type: "object",
-          properties: {
-            status: { type: "string" },
-            data: {
-              type: "object",
-              properties: {
-                title: { type: "string" },
-                author: { type: "string" },
-                kategori: { type: "string" },
-                lolos: { type: "string" },
-                cerita: { type: "string" },
-              },
-            },
-          },
+          $ref: "responseSchema#", // Referensi skema global
         },
         500: {
           description: "Gagal mengambil cerpen",
@@ -110,6 +106,12 @@ app.get(
     }
   }
 );
+
+// ** Swagger - Generate Spesifikasi Swagger **
+app.ready((err) => {
+  if (err) throw err;
+  app.swagger(); // Generate spesifikasi Swagger
+});
 
 // ** Menentukan Port Server **
 const port = process.env.PORT || 3000;
