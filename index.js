@@ -1,21 +1,17 @@
-const path = require("path");
 const Fastify = require("fastify");
 const cerpen = require("./api/timeApi.js"); // Import fungsi cerpen
 
-// ** Inisialisasi Fastify **
 const app = Fastify({
   logger: true,
-  ajv: {
-    customOptions: { strict: false }, // Nonaktifkan strict mode
-  },
+  ajv: { customOptions: { strict: false } }, // Disable strict mode
 });
 
-// ** Swagger Plugin **
-app.register(require("@fastify/swagger"), {
+// Swagger setup
+app.register(require('@fastify/swagger'), {
   swagger: {
     info: {
       title: "API Cerpen Fax",
-      description: "API untuk mendapatkan cerpen dari kategori tertentu",
+      description: "API untuk mendapatkan cerpen berdasarkan kategori",
       version: "1.0.0",
     },
     host: "localhost:3000",
@@ -25,17 +21,18 @@ app.register(require("@fastify/swagger"), {
   },
 });
 
-app.register(require("@fastify/swagger-ui"), {
+// Swagger UI setup
+app.register(require('@fastify/swagger-ui'), {
   routePrefix: "/docs",
   staticCSP: true,
 });
 
-// ** Endpoint Utama **
+// Main endpoint
 app.get("/", async (req, res) => {
   res.send("Selamat datang di API Cerpen Fax! Buka dokumentasi di /docs.");
 });
 
-// ** Endpoint untuk Mendapatkan Cerpen **
+// Endpoint untuk mendapatkan cerpen berdasarkan kategori
 app.get(
   "/cerpen/:category",
   {
@@ -45,7 +42,7 @@ app.get(
       params: {
         type: "object",
         properties: {
-          category: { type: "string", description: "Kategori cerpen", example: "cinta" },
+          category: { type: "string", description: "Kategori cerpen", example: "cinta" }
         },
         required: ["category"],
       },
@@ -80,14 +77,13 @@ app.get(
   }
 );
 
-// ** Swagger - Generate Spesifikasi Swagger **
+// Generate Swagger spec
 app.ready((err) => {
   if (err) throw err;
-  console.log(app.printRoutes()); // Debugging
-  app.swagger();
+  app.swagger(); // Generate Swagger spec for routes
 });
 
-// ** Menentukan Port Server **
+// Start the server
 const port = process.env.PORT || 3000;
 app.listen({ port }, () => {
   console.log(`Server running on port: ${port}`);
