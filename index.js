@@ -6,7 +6,7 @@ const cerpen = require("./api/timeApi.js"); // Import fungsi cerpen
 const app = Fastify({
   logger: true,
   ajv: {
-    customOptions: { strict: false }, // Nonaktifkan strict mode untuk Swagger
+    customOptions: { strict: false }, // Nonaktifkan strict mode
   },
 });
 
@@ -26,9 +26,8 @@ app.register(require("@fastify/swagger"), {
 });
 
 app.register(require("@fastify/swagger-ui"), {
-  routePrefix: "/docs", // Akses Swagger UI di http://localhost:3000/docs
+  routePrefix: "/docs",
   staticCSP: true,
-  transformStaticCSP: (header) => header,
 });
 
 // ** Endpoint Utama **
@@ -42,15 +41,11 @@ app.get(
   {
     schema: {
       description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"], // Grup di Swagger UI
+      tags: ["Cerpen"],
       params: {
         type: "object",
         properties: {
-          category: {
-            type: "string",
-            description: "Kategori cerpen yang ingin dicari",
-            example: "cinta", // Contoh input kategori
-          },
+          category: { type: "string", description: "Kategori cerpen", example: "cinta" },
         },
         required: ["category"],
       },
@@ -88,8 +83,8 @@ app.get(
 // ** Swagger - Generate Spesifikasi Swagger **
 app.ready((err) => {
   if (err) throw err;
-  console.log(app.printRoutes()); // Debugging route
-  app.swagger(); // Generate Swagger
+  console.log(app.printRoutes()); // Debugging
+  app.swagger();
 });
 
 // ** Menentukan Port Server **
