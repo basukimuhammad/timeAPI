@@ -33,10 +33,13 @@ app.register(require("@fastify/swagger-ui"), {
   staticCSP: true,
   transformStaticCSP: (header) => header,
   uiConfig: {
-    docExpansion: "full", // Menampilkan seluruh dokumentasi
+    docExpansion: "full",
     deepLinking: true,
+    showExtensions: true, // Menampilkan ekstensi Swagger
+    showCommonExtensions: true, // Menampilkan ekstensi umum
   },
 });
+
 
 // Main endpoint
 app.get("/", async (req, res) => {
@@ -48,48 +51,44 @@ app.get(
   "/cerpen/:category",
   {
     schema: {
-      description: "Dapatkan cerpen berdasarkan kategori",
-      tags: ["Cerpen"], // Pastikan ini sama dengan tag di konfigurasi Swagger
-      params: {
-        type: "object",
-        properties: {
-          category: {
-            type: "string",
-            description: "Kategori cerpen yang ingin diambil",
-            example: "cinta",
-          },
-        },
-        required: ["category"],
-      },
-      response: {
-        200: {
-          description: "Cerpen berhasil diambil",
+  description: "Dapatkan cerpen berdasarkan kategori",
+  tags: ["Cerpen"], // Pastikan ini sesuai dengan tags di Swagger config
+  params: {
+    type: "object",
+    properties: {
+      category: { type: "string", description: "Nama kategori", example: "cinta" },
+    },
+    required: ["category"],
+  },
+  response: {
+    200: {
+      description: "Cerpen berhasil diambil",
+      type: "object",
+      properties: {
+        status: { type: "string", example: "success" },
+        data: {
           type: "object",
           properties: {
-            status: { type: "string", example: "success" },
-            data: {
-              type: "object",
-              properties: {
-                title: { type: "string", example: "Judul Cerpen" },
-                author: { type: "string", example: "Nama Penulis" },
-                kategori: { type: "string", example: "Cinta" },
-                lolos: { type: "string", example: "2024-01-01" },
-                cerita: { type: "string", example: "Isi cerpen ..." },
-              },
-            },
-          },
-        },
-        400: {
-          description: "Kesalahan pada parameter",
-          type: "object",
-          properties: {
-            status: { type: "string", example: "error" },
-            message: { type: "string", example: "Kategori tidak ditemukan" },
+            title: { type: "string", example: "Judul Cerpen" },
+            author: { type: "string", example: "Nama Penulis" },
+            kategori: { type: "string", example: "Cinta" },
+            lolos: { type: "string", example: "2024-01-01" },
+            cerita: { type: "string", example: "Isi cerpen ..." },
           },
         },
       },
     },
+    400: {
+      description: "Kesalahan input",
+      type: "object",
+      properties: {
+        status: { type: "string", example: "error" },
+        message: { type: "string", example: "Kategori tidak ditemukan" },
+      },
+    },
   },
+}
+
   async (req, res) => {
     try {
       const category = req.params.category;
