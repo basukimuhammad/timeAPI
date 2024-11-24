@@ -6,7 +6,7 @@ const cerpen = require("./api/timeApi.js"); // Import fungsi cerpen
 const app = Fastify({
   logger: true,
   ajv: {
-    customOptions: { strict: false }, // Nonaktifkan mode strict untuk support 'example'
+    customOptions: { strict: false }, // Nonaktifkan strict mode untuk Swagger
   },
 });
 
@@ -29,11 +29,6 @@ app.register(require("@fastify/swagger-ui"), {
   routePrefix: "/docs", // Akses Swagger UI di http://localhost:3000/docs
   staticCSP: true,
   transformStaticCSP: (header) => header,
-});
-
-// ** Konfigurasi File Statis **
-app.register(require("@fastify/static"), {
-  root: path.join(__dirname, "api"),
 });
 
 // ** Endpoint Utama **
@@ -77,42 +72,24 @@ app.get(
             },
           },
         },
-        500: {
-          description: "Gagal mengambil cerpen",
-          type: "object",
-          properties: {
-            status: { type: "string" },
-            message: { type: "string" },
-            error: { type: "string" },
-          },
-        },
       },
     },
   },
   async (req, res) => {
     const category = req.params.category;
-
-    try {
-      const hasilCerpen = await cerpen(category); // Panggil fungsi cerpen
-      res.send({
-        status: "success",
-        data: hasilCerpen,
-      });
-    } catch (error) {
-      console.error(`Error in API /cerpen/: ${error.message}`); // Log error API
-      res.status(500).send({
-        status: "error",
-        message: "Gagal mengambil cerpen. Pastikan kategori benar atau coba lagi nanti.",
-        error: error.message,
-      });
-    }
+    const hasilCerpen = await cerpen(category);
+    res.send({
+      status: "success",
+      data: hasilCerpen,
+    });
   }
 );
 
 // ** Swagger - Generate Spesifikasi Swagger **
 app.ready((err) => {
   if (err) throw err;
-  app.swagger(); // Generate spesifikasi Swagger
+  console.log(app.printRoutes()); // Debugging route
+  app.swagger(); // Generate Swagger
 });
 
 // ** Menentukan Port Server **
