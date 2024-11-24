@@ -8,19 +8,33 @@ const app = Fastify({
 
 // ** Swagger Plugin **
 app.register(require("@fastify/swagger"), {
-  routePrefix: "/docs", // Rute untuk dokumentasi
   swagger: {
     info: {
       title: "API Cerpen Fax",
       description: "API untuk mendapatkan cerpen dari kategori tertentu",
       version: "1.0.0",
     },
-    host: "localhost:3000", // Ganti dengan domain jika di-deploy
-    schemes: ["http"], // Gunakan https untuk production
+    host: "localhost:3000",
+    schemes: ["http"],
     consumes: ["application/json"],
     produces: ["application/json"],
   },
-  exposeRoute: true, // Penting untuk membuat rute /docs tersedia
+});
+
+fastify.register(require('@fastify/swagger'), {
+  routePrefix: '/docs',
+  swagger: {
+    info: {
+      title: 'API Cerpen Fax',
+      description: 'API untuk mendapatkan cerpen dari kategori tertentu',
+      version: '1.0.0'
+    },
+    host: 'cerpen-api.vercel.app',
+    schemes: ['https'],
+    consumes: ['application/json'],
+    produces: ['application/json']
+  },
+  exposeRoute: true
 });
 
 // ** Konfigurasi File Statis **
@@ -34,37 +48,51 @@ app.get("/", async (req, res) => {
 });
 
 // ** Endpoint untuk Mendapatkan Cerpen **
-app.get("/cerpen/:category", {
-  schema: {
-    description: "Mendapatkan cerpen dari kategori tertentu",
-    params: {
-      type: "object",
-      properties: {
-        category: { type: "string", description: "Kategori cerpen" },
-      },
-      required: ["category"],
-    },
-    response: {
-      200: {
+app.get(
+  "/cerpen/:category",
+  {
+    schema: {
+      description: "Dapatkan cerpen berdasarkan kategori",
+      tags: ["Cerpen"],
+      params: {
         type: "object",
         properties: {
-          status: { type: "string" },
-          data: {
-            type: "object",
-            properties: {
-              title: { type: "string" },
-              author: { type: "string" },
-              kategori: { type: "string" },
-              lolos: { type: "string" },
-              cerita: { type: "string" },
+          category: { type: "string", description: "Kategori cerpen" },
+        },
+        required: ["category"],
+      },
+      response: {
+        200: {
+          description: "Cerpen berhasil diambil",
+          type: "object",
+          properties: {
+            status: { type: "string" },
+            data: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                author: { type: "string" },
+                kategori: { type: "string" },
+                lolos: { type: "string" },
+                cerita: { type: "string" },
+              },
             },
+          },
+        },
+        500: {
+          description: "Gagal mengambil cerpen",
+          type: "object",
+          properties: {
+            status: { type: "string" },
+            message: { type: "string" },
+            error: { type: "string" },
           },
         },
       },
     },
   },
   async (req, res) => {
-    const { category } = req.params;
+    const category = req.params.category;
 
     try {
       const hasilCerpen = await cerpen(category); // Panggil fungsi cerpen
@@ -73,15 +101,15 @@ app.get("/cerpen/:category", {
         data: hasilCerpen,
       });
     } catch (error) {
-      console.error(`Error in API /cerpen/: ${error.message}`);
+      console.error(`Error in API /cerpen/: ${error.message}`); // Log error API
       res.status(500).send({
         status: "error",
         message: "Gagal mengambil cerpen. Pastikan kategori benar atau coba lagi nanti.",
         error: error.message,
       });
     }
-  },
-});
+  }
+);
 
 // ** Menentukan Port Server **
 const port = process.env.PORT || 3000;
