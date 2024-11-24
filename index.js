@@ -7,24 +7,31 @@ const app = Fastify({
 });
 
 // Swagger setup
-app.register(require('@fastify/swagger'), {
+app.register(require("@fastify/swagger"), {
   swagger: {
     info: {
-      title: "API Cerpen Fax",
-      description: "API untuk mendapatkan cerpen berdasarkan kategori",
+      title: "API Cerpen",
+      description: "API untuk mendapatkan cerpen dari kategori tertentu",
       version: "1.0.0",
     },
     host: "localhost:3000",
     schemes: ["http"],
     consumes: ["application/json"],
     produces: ["application/json"],
+    tags: [
+      { name: "Cerpen", description: "Operasi terkait cerpen" },
+    ],
   },
 });
 
-// Swagger UI setup
-app.register(require('@fastify/swagger-ui'), {
+app.register(require("@fastify/swagger-ui"), {
   routePrefix: "/docs",
   staticCSP: true,
+  transformStaticCSP: (header) => header,
+  uiConfig: {
+    docExpansion: "full", // Menampilkan seluruh dokumentasi
+    deepLinking: true,
+  },
 });
 
 // Main endpoint
